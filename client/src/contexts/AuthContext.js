@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
+import { API_URLS } from '../config/api';
 
 const AuthContext = createContext();
 
@@ -31,7 +32,7 @@ export const AuthProvider = ({ children }) => {
       const token = localStorage.getItem('chronotask_token');
       if (token) {
         try {
-          const response = await axios.get('/api/auth/me');
+          const response = await axios.get(API_URLS.AUTH + '/me');
           setUser(response.data.user);
           setIsAuthenticated(true);
         } catch (error) {
@@ -47,7 +48,7 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
-      const response = await axios.post('/api/auth/login', { email, password });
+      const response = await axios.post(API_URLS.AUTH + '/login', { email, password });
       const { token, user } = response.data;
       
       localStorage.setItem('chronotask_token', token);
@@ -66,7 +67,7 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (username, email, password) => {
     try {
-      const response = await axios.post('/api/auth/register', { username, email, password });
+      const response = await axios.post(API_URLS.AUTH + '/register', { username, email, password });
       const { token, user } = response.data;
       
       localStorage.setItem('chronotask_token', token);
