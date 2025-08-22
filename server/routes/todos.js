@@ -8,6 +8,33 @@ const router = express.Router();
 // All routes are protected
 router.use(auth);
 
+// Test endpoint for debugging status updates
+router.get('/test-status/:id', async (req, res) => {
+  try {
+    const todo = await Todo.findOne({ _id: req.params.id, user: req.user._id });
+    if (!todo) {
+      return res.status(404).json({ message: 'Todo not found' });
+    }
+    
+    res.json({
+      message: 'Todo status test',
+      todo: {
+        id: todo._id,
+        title: todo.title,
+        status: todo.status,
+        updatedAt: todo.updatedAt
+      }
+    });
+  } catch (error) {
+    console.error('Test status error:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
+// Routes
+app.use('/api/auth', authRoutes);
+app.use('/api/todos', todoRoutes);
+
 // @route   GET /api/todos
 // @desc    Get all todos for current user
 // @access  Private
@@ -159,21 +186,32 @@ router.patch('/:id/status', [
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
+      console.error('Validation errors:', errors.array());
       return res.status(400).json({ errors: errors.array() });
     }
 
+    console.log('Updating todo status:', { todoId: req.params.id, newStatus: req.body.status, userId: req.user._id });
+
     const todo = await Todo.findOne({ _id: req.params.id, user: req.user._id });
     if (!todo) {
+      console.error('Todo not found:', req.params.id);
       return res.status(404).json({ message: 'Todo not found' });
     }
 
-    todo.status = req.body.status;
-    await todo.save();
+    console.log('Found todo:', { id: todo._id, oldStatus: todo.status, newStatus: req.body.status });
 
-    res.json(todo);
+    // Update the status
+    todo.status = req.body.status;
+    
+    // Save to database
+    const savedTodo = await todo.save();
+    
+    console.log('Todo status updated successfully:', { id: savedTodo._id, status: savedTodo.status });
+
+    res.json(savedTodo);
   } catch (error) {
     console.error('Update status error:', error);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Server error', error: error.message });
   }
 });
 

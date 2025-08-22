@@ -55,9 +55,16 @@ export const deleteTodo = async (todoId) => {
 // Update todo status
 export const updateTodoStatus = async (todoId, status) => {
   try {
+    console.log('Updating todo status:', { todoId, status });
+    
     const response = await axios.patch(`${API_URLS.TODOS}/${todoId}/status`, { status });
+    
+    console.log('Status update response:', response.data);
+    
     return response.data;
   } catch (error) {
+    console.error('Status update error:', error);
+    console.error('Error response:', error.response?.data);
     throw new Error(error.response?.data?.message || 'Failed to update todo status');
   }
 };

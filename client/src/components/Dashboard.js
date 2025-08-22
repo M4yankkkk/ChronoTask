@@ -6,7 +6,7 @@ import WeeklyCalendar from './calendar/WeeklyCalendar';
 import AddTodoModal from './todos/AddTodoModal';
 import TodoDetailsModal from './todos/TodoDetailsModal';
 import ProgressTracker from './dashboard/ProgressTracker';
-import { getWeekTodos } from '../services/todoService';
+import { getWeekTodos, updateTodoStatus } from '../services/todoService';
 import toast from 'react-hot-toast';
 
 const Dashboard = () => {
@@ -55,10 +55,26 @@ const Dashboard = () => {
     toast.success('Task deleted successfully! 🗑️');
   };
 
-  const handleStatusChange = (todoId, newStatus) => {
-    setTodos(prev => prev.map(todo => 
-      todo._id === todoId ? { ...todo, status: newStatus } : todo
-    ));
+  const handleStatusChange = async (todoId, newStatus) => {
+    try {
+      // Update local state immediately for better UX
+      setTodos(prev => prev.map(todo => 
+        todo._id === todoId ? { ...todo, status: newStatus } : todo
+      ));
+      
+      // Call API to persist the change
+      await updateTodoStatus(todoId, newStatus);
+      
+      // Show success message
+      const statusText = newStatus === 'completed' ? 'completed' : 'marked as pending';
+      toast.success(`Task ${statusText}! ✨`);
+    } catch (error) {
+      // Revert local state if API call fails
+      setTodos(prev => prev.map(todo => 
+        todo._id === todoId ? { ...todo, status: todo.status === 'completed' ? 'pending' : 'completed' } : todo
+      ));
+      toast.error('Failed to update task status');
+    }
   };
 
   const filteredTodos = todos.filter(todo => {

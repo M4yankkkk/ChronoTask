@@ -31,6 +31,16 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', message: 'ChronoTask API is running!' });
 });
 
+// Test endpoint for debugging
+app.get('/api/test', (req, res) => {
+  res.json({ 
+    status: 'OK', 
+    message: 'Test endpoint working',
+    timestamp: new Date().toISOString(),
+    env: process.env.NODE_ENV || 'development'
+  });
+});
+
 app.listen(PORT, () => {
   console.log(`⚡ ChronoTask server running on port ${PORT}`);
 });
