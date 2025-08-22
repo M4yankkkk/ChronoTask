@@ -1,3 +1,9 @@
+# Exclude everything except server directory
+*
+!server/
+!server/**
+
+# Specifically exclude these files
 client/
 node_modules/
 .git/
@@ -6,3 +12,9 @@ README.md
 DEPLOYMENT.md
 vercel.json
 package-lock.json
+package.json
+render.yaml
+.render/
+client/build/
+client/public/
+client/src/

@@ -3,8 +3,8 @@ services:
     name: chronotask-backend
     env: node
     plan: free
-    buildCommand: cd server && npm install
-    startCommand: cd server && node index.js
+    buildCommand: npm install
+    startCommand: node index.js
     envVars:
       - key: NODE_ENV
         value: production
@@ -12,10 +12,3 @@ services:
         sync: false
       - key: JWT_SECRET
         sync: false
-    buildFilter:
-      paths:
-        - server/**
-      ignorePaths:
-        - client/**
-        - node_modules/**
-        - .git/**
